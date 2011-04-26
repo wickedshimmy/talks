@@ -1,0 +1,169 @@
+\documentclass{beamer}
+\usepackage{minted}
+\usemintedstyle{vs}
+
+\title{
+	Functional composition in C\#\\
+	Expression trees and dynamic (re)compilation
+}
+\author{Matt Enright \and {John Campbell}}
+\date[]{
+	Pittsburgh CodeCamp 2011.1\\
+	30. April 2011
+}
+
+\AtBeginSection[] {
+	\frame{\sectionpage}
+	\frame{\tableofcontents[currentsection]}
+}
+
+\begin{document}
+\frame[plain]{\titlepage\includegraphics[scale=0.5]{snap}}
+
+\begin{frame}[plain]
+	\frametitle{Abstract}
+	.NET 3.5 added powerful new capabilities for both code generation and
+	function manipulation. Expression syntax has now entered the mainstream
+	via the use of lambda expressions in APIs like LINQ, Moq, and ASP.NET MVC
+	as a way to reproduce reflection capabilities in a compile-safe fashion --
+	but reflection is just scratching at the surface of the power of
+	expression trees. This talk will look at what these APIs are doing under
+	the hood, and then dive into dynamic expression generation in complex
+	software like LINQ providers and the DLR, plus exploring the new
+	expression APIs for control structures and statements in .NET4 and showing
+	some novel uses of expression trees to do the otherwise-impossible in
+	C\#.
+\end{frame}
+\frame[plain]{\tableofcontents}
+
+\section{Introduction}
+\subsection{About us}
+\subsection{Delegates}
+	\begin{frame}
+		"function pointer"
+	\end{frame}
+	\begin{frame}
+		Delegate instance/object/type
+		Multi-cast?
+		Assignation versus invocation
+	\end{frame}
+	\begin{frame}
+		Anonymous delegate
+	\end{frame}
+	\begin{frame}
+		CLOSURE
+	\end{frame}
+	\begin{frame}
+		Lambda expression syntax
+		type inference
+	\end{frame}
+
+\subsection{Expressions}
+	\begin{frame}
+		Definition
+		Value, type
+	\end{frame}
+	\begin{frame}
+		Immutability
+	\end{frame}
+	\begin{frame}
+		Difference to delegate instance
+		Same syntax (lambda)
+	\end{frame}
+	\begin{frame}
+		System.Linq.Expressions.Expression
+		\begin{itemize}
+			\item Name
+			\item Reduction (CanReduce/Reduce ())
+		\end{itemize}
+	\end{frame}
+
+\section{Expression syntax}
+\subsection{API design}
+	\begin{frame}
+		Expression.Name
+	\end{frame}
+	\begin{frame}
+		ASP.NET MVC (HTML helpers)
+		ExpressionHelper
+	\end{frame}
+
+\subsection{Reflection}
+	\begin{frame}[fragile]
+		\begin{minted}{csharp}
+		var myString = "PGHdotNET";
+
+		object lengthProp = typeof(string).GetProperty ("Length");
+		var name = lengthProp.Name;
+		int len = (int)info.GetValue (myString);
+		\end{minted}
+	\end{frame}
+
+	\begin{frame}
+		\Huge That sucks.
+	\end{frame}
+
+	\begin{frame}[fragile]
+		\frametitle{}
+		\begin{itemize}
+			\item Not compile-safe.
+				\pause
+				\begin{minted}[fontsize=\scriptsize]{csharp}
+				PropertyInfo lengthProp = typeof(string).GetProperty ("Lengh");
+				int len = (int)info.GetValue ("hello");
+				\end{minted}
+				\pause
+			\item Not readable.
+				\pause
+				\begin{minted}[fontsize=\scriptsize]{csharp}
+				PropertyInfo lengthProp = typeof(string).GetProperty ()
+				\end{minted}
+				\pause
+			\item Not writeable
+				\pause
+				\begin{minted}[fontsize=\scriptsize]{csharp}
+				MethodInfo equals = typeof(string).GetMethod ("Equals");
+				\end{minted}
+				\pause
+			\item Slow. \pause
+		\end{itemize}
+	\end{frame}
+
+	\begin{frame}
+	\end{frame}
+
+	\begin{frame}[fragile]
+		\frametitle{Example: Generic operators}
+		\begin{minted}{csharp}
+		static T Add<T> (T a, T b)
+		{
+	    	var e = Expression.Lambda<Func<T,T,T>> (
+	        	Expression.Add (paramA, paramB),
+	        	Expression.Parameter (typeof(T), "a"),
+	        	Expression.Parameter (typeof(T), "b"));
+
+	    	return e.Compile () (a, b);
+		}
+		\end{minted}
+	\end{frame}
+
+\section{Expression trees}
+\subsection{Language introspection}
+	\begin{frame}
+		AST
+	\end{frame}
+	\begin{frame}
+	\end{frame}
+\subsection{Cross-compilation}
+\subsection{Performance optimization}
+
+\section{Expression trees Mk II}
+\subsection{Assignment}
+\subsection{Control flow}
+\subsection{Member dispatch}
+
+\begin{frame}
+	\frametitle{Questions?}
+\end{frame}
+
+\end{document}
