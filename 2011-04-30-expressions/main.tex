@@ -70,11 +70,34 @@
 		Difference to delegate instance
 		Same syntax (lambda)
 	\end{frame}
-	\begin{frame}
-		System.Linq.Expressions.Expression
+	\begin{frame}[fragile]
+		\frametitle{System.Linq.Expressions.Expression}
+		\begin{minted}{csharp}
+		Expression e = Expression.Add (
+		    Expression.Constant (2),
+		    Expression.Constant (1));
+		\end{minted}
+		\pause
 		\begin{itemize}
-			\item Name
-			\item Reduction (CanReduce/Reduce ())
+			\item
+				\begin{minted}{csharp}
+				e.Type; // System.Int32
+				\end{minted}
+			\pause
+			\item
+				\begin{minted}{csharp}
+				e.NodeType; // Add
+				\end{minted}
+			\pause
+			\item
+				\begin{minted}{csharp}
+				e.GetType (); // SimpleBinaryExpression
+				\end{minted}
+			\pause
+			\item
+				\begin{minted}{csharp}
+				e.ToString (); // (2 + 1)
+				\end{minted}
 		\end{itemize}
 	\end{frame}
 
